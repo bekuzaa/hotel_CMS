@@ -39,6 +39,7 @@ import {
   LucideIcon,
   X,
   AlarmClock,
+  CheckCircle,
 } from "lucide-react";
 
 // Device ID generator
@@ -109,6 +110,102 @@ export default function TVLauncher() {
   const [serviceType, setServiceType] = useState<string>("");
   const [showHotelInfo, setShowHotelInfo] = useState(false);
   const [showMessages, setShowMessages] = useState(false);
+  const [language, setLanguage] = useState<string>("en");
+  const [showLanguageDialog, setShowLanguageDialog] = useState(false);
+
+  // Translations
+  const t = {
+    en: {
+      welcome: "WELCOME TO YOUR ROOM",
+      roomService: "Room Service",
+      housekeeping: "Housekeeping",
+      wakeup: "Wake-up",
+      hotelInfo: "Hotel Info",
+      frontDesk: "Front Desk",
+      checkoutToday: "Checkout today at 12:00 PM",
+      checkoutTomorrow: "Checkout tomorrow at 12:00 PM",
+      setWakeup: "Set Wake-up Call",
+      wakeupSet: "Wake-up Call Set",
+      scheduledCalls: "Scheduled Calls",
+      selectTime: "Select Time",
+      scheduling: "Scheduling...",
+      cancel: "Cancel",
+      recurring: "Recurring",
+      wifiAccess: "WiFi Access",
+      network: "Network",
+      password: "Password",
+      needAssistance: "Need Assistance?",
+      useArrows: "Use arrow keys to navigate • Press Enter to select",
+    },
+    th: {
+      welcome: "ยินดีต้อนรับสู่ห้องพักของคุณ",
+      roomService: "บริการห้องอาหาร",
+      housekeeping: "แม่บ้าน",
+      wakeup: "ปลุก",
+      hotelInfo: "ข้อมูลโรงแรม",
+      frontDesk: "ฟร้อนท์เดสก์",
+      checkoutToday: "เช็คเอาท์วันนี้ เวลา 12:00 น.",
+      checkoutTomorrow: "เช็คเอาท์พรุ่งนี้ เวลา 12:00 น.",
+      setWakeup: "ตั้งเวลาปลุก",
+      wakeupSet: "ตั้งเวลาปลุกแล้ว",
+      scheduledCalls: "เวลาปลุกที่ตั้งไว้",
+      selectTime: "เลือกเวลา",
+      scheduling: "กำลังบันทึก...",
+      cancel: "ยกเลิก",
+      recurring: "ทุกวัน",
+      wifiAccess: "เชื่อมต่อ WiFi",
+      network: "เครือข่าย",
+      password: "รหัสผ่าน",
+      needAssistance: "ต้องการความช่วยเหลือ?",
+      useArrows: "ใช้ปุ่มลูกศรเพื่อนำทาง • กด Enter เพื่อเลือก",
+    },
+    zh: {
+      welcome: "欢迎来到您的房间",
+      roomService: "客房服务",
+      housekeeping: "客房清洁",
+      wakeup: "叫醒",
+      hotelInfo: "酒店信息",
+      frontDesk: "前台",
+      checkoutToday: "今天12:00退房",
+      checkoutTomorrow: "明天12:00退房",
+      setWakeup: "设置叫醒服务",
+      wakeupSet: "已设置叫醒",
+      scheduledCalls: "已安排的叫醒",
+      selectTime: "选择时间",
+      scheduling: "安排中...",
+      cancel: "取消",
+      recurring: "每天",
+      wifiAccess: "WiFi连接",
+      network: "网络",
+      password: "密码",
+      needAssistance: "需要帮助?",
+      useArrows: "使用方向键导航 • 按Enter选择",
+    },
+    ja: {
+      welcome: "お部屋へようこそ",
+      roomService: "ルームサービス",
+      housekeeping: "ハウスキーピング",
+      wakeup: "モーニングコール",
+      hotelInfo: "ホテル情報",
+      frontDesk: "フロント",
+      checkoutToday: "本日12:00チェックアウト",
+      checkoutTomorrow: "明日12:00チェックアウト",
+      setWakeup: "モーニングコール設定",
+      wakeupSet: "モーニングコール設定済み",
+      scheduledCalls: "予約済み",
+      selectTime: "時間を選択",
+      scheduling: "設定中...",
+      cancel: "キャンセル",
+      recurring: "毎日",
+      wifiAccess: "WiFi接続",
+      network: "ネットワーク",
+      password: "パスワード",
+      needAssistance: "お困りですか?",
+      useArrows: "矢印キーで移動 • Enterで選択",
+    },
+  };
+
+  const currentLang = t[language as keyof typeof t] || t.en;
 
   // Request pairing code
   const requestCode = trpc.pairing.requestCode.useMutation({
@@ -505,6 +602,14 @@ export default function TVLauncher() {
             >
               <Info className="w-6 h-6 text-white" />
             </button>
+
+            {/* Language Button */}
+            <button
+              onClick={() => setShowLanguageDialog(true)}
+              className="hover:bg-white/10 px-2 py-1 rounded-lg transition-colors flex items-center gap-1"
+            >
+              <span className="text-white font-medium text-sm uppercase">{language}</span>
+            </button>
           </div>
 
           {/* Time */}
@@ -644,7 +749,7 @@ export default function TVLauncher() {
                 className="flex flex-col items-center gap-1 bg-white/10 hover:bg-white/20 rounded-xl px-4 py-3 transition-colors"
               >
                 <UtensilsCrossed className="w-6 h-6 text-orange-400" />
-                <span className="text-xs text-white/80">Room Service</span>
+                <span className="text-xs text-white/80">{currentLang.roomService}</span>
               </button>
               <button
                 onClick={() => {
@@ -654,14 +759,14 @@ export default function TVLauncher() {
                 className="flex flex-col items-center gap-1 bg-white/10 hover:bg-white/20 rounded-xl px-4 py-3 transition-colors"
               >
                 <Bed className="w-6 h-6 text-blue-400" />
-                <span className="text-xs text-white/80">Housekeeping</span>
+                <span className="text-xs text-white/80">{currentLang.housekeeping}</span>
               </button>
               <button
                 onClick={() => setShowWakeUpDialog(true)}
                 className="flex flex-col items-center gap-1 bg-white/10 hover:bg-white/20 rounded-xl px-4 py-3 transition-colors"
               >
                 <AlarmClock className="w-6 h-6 text-yellow-400" />
-                <span className="text-xs text-white/80">Wake-up</span>
+                <span className="text-xs text-white/80">{currentLang.wakeup}</span>
               </button>
               <button
                 onClick={() => setShowHotelInfo(true)}
@@ -972,6 +1077,54 @@ export default function TVLauncher() {
                   </div>
                 </div>
               )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Language Selection Dialog */}
+      {showLanguageDialog && (
+        <div className="absolute inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm">
+          <div 
+            className="bg-slate-900 rounded-2xl p-8 max-w-sm w-full mx-4 border border-white/20"
+            style={{ background: `linear-gradient(to bottom right, ${primaryColor}20, ${secondaryColor}10)` }}
+          >
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-2xl font-bold text-white">Language</h2>
+              <button
+                onClick={() => setShowLanguageDialog(false)}
+                className="p-2 hover:bg-white/10 rounded-lg transition-colors"
+              >
+                <X className="w-6 h-6 text-white/70" />
+              </button>
+            </div>
+
+            <div className="space-y-2">
+              {[
+                { code: "en", name: "English", flag: "🇺🇸" },
+                { code: "th", name: "ไทย", flag: "🇹🇭" },
+                { code: "zh", name: "中文", flag: "🇨🇳" },
+                { code: "ja", name: "日本語", flag: "🇯🇵" },
+              ].map((lang) => (
+                <button
+                  key={lang.code}
+                  onClick={() => {
+                    setLanguage(lang.code);
+                    setShowLanguageDialog(false);
+                  }}
+                  className={`w-full flex items-center gap-4 p-4 rounded-xl transition-all ${
+                    language === lang.code
+                      ? "bg-white/20 border-2 border-white/40"
+                      : "bg-white/5 hover:bg-white/10 border-2 border-transparent"
+                  }`}
+                >
+                  <span className="text-3xl">{lang.flag}</span>
+                  <span className="text-white font-medium text-lg">{lang.name}</span>
+                  {language === lang.code && (
+                    <CheckCircle className="w-5 h-5 text-green-400 ml-auto" />
+                  )}
+                </button>
+              ))}
             </div>
           </div>
         </div>
