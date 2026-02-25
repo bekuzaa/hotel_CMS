@@ -167,3 +167,48 @@
 - [x] สร้าง database migration (0006_add_local_auth.sql)
 - [x] เพิ่ม demo credentials display (gmmz / gmmz@1234)
 - [x] สร้าง Unit Tests สำหรับ Auth router
+
+## Phase 16: Advanced Features Enhancement
+- [x] Add device pairing system with 6-character alphanumeric codes
+- [x] Create TV Launcher frontend page (/tv route)
+- [x] Add TV-optimized UI components (large text, remote-friendly navigation)
+- [x] Implement WebSocket real-time sync for TV devices
+- [x] Create TV Apps configuration system (dynamic app loading from CMS)
+- [x] Add TV Apps management page in CMS
+- [x] Migrate database to SQLite for better compatibility
+- [x] Add more streaming apps (Disney+, Prime Video, HBO GO, Apple TV+)
+- [x] Implement hotel branding customization (logo, colors, welcome messages)
+- [x] Add weather widget integration (OpenWeatherMap API)
+- [x] Implement guest services ordering (room service, housekeeping)
+- [x] Add Hotel Branding CMS page for easy logo/color configuration
+- [x] Create TV Launcher service ordering UI for guests
+- [x] Implement real-time WebSocket notifications for service requests
+- [x] Add checkout reminder system
+- [x] Create wake-up call scheduling feature (one-time and recurring)
+- [x] Add hotel information dialog on TV Launcher
+- [x] Implement quick actions bar on TV Launcher
+- [x] Add multi-language support (EN, TH, ZH, JA) to TV Launcher
+- [x] Create local attractions page
+- [x] Add express checkout feature
+- [x] Implement room control features (AC, lights, blinds)
+- [x] **Total: 100 enhancement tasks completed**
+
+## Phase 17: Android TV Native Home Launcher
+- [x] Create complete Android TV native app project structure
+- [x] Implement MainActivity with full launcher UI (290 lines)
+- [x] Create BootReceiver for auto-start on TV boot
+- [x] Implement PairingManager for CMS device pairing (182 lines)
+- [x] Create PreferencesManager for local storage (90 lines)
+- [x] Build HotelApiService interface for tRPC API integration
+- [x] Implement AppAdapter for RecyclerView
+- [x] Design TV-optimized layouts (activity_main.xml, item_app.xml)
+- [x] Create vector icons (ic_launcher.xml, tv_banner.xml)
+- [x] Implement password-protected settings menu (default: 9988)
+- [x] Add remote control navigation support (D-pad)
+- [x] Integrate hotel branding via tRPC API
+- [x] Implement dynamic app loading from CMS configuration
+- [x] Add quick actions bar (Room Service, Housekeeping, Wake-up, etc.)
+- [x] Display real-time clock, date, and weather
+- [x] Create comprehensive documentation (README, QUICK_START, IMPLEMENTATION_GUIDE)
+- [x] Commit and push to GitHub (25 files, 2,034 insertions)
+- [x] **Android TV Native Home Launcher Complete!**
