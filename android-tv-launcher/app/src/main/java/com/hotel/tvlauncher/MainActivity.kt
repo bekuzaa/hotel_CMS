@@ -25,11 +25,16 @@ class MainActivity : AppCompatActivity() {
     private lateinit var logoImage: ImageView
     private lateinit var welcomeText: TextView
     private lateinit var pairingStatusText: TextView
+    private lateinit var networkStatusIcon: TextView
+    private lateinit var volumeLevelText: TextView
     
     private var selectedPosition = 0
     private var pairingCode = ""
     private var pairingManager: PairingManager? = null
     private var appsList = listOf<AppItem>()
+    private var deviceController: DeviceController? = null
+    private var networkMonitor: NetworkMonitor? = null
+    private var checkoutListener: CheckoutListener? = null
     
     // API Service
     private lateinit var apiService: HotelApiService
@@ -50,6 +55,13 @@ class MainActivity : AppCompatActivity() {
         // Setup API
         setupAPI()
         
+        // Initialize device controller and network monitor
+        deviceController = DeviceController(this)
+        networkMonitor = NetworkMonitor(this)
+        checkoutListener = CheckoutListener(this).apply {
+            initAppCleaner()
+        }
+        
         // Load initial data
         loadLauncherData()
         
@@ -58,6 +70,12 @@ class MainActivity : AppCompatActivity() {
         
         // Request pairing code
         requestPairingCode()
+        
+        // Start heartbeat for online status
+        startNetworkHeartbeat()
+        
+        // Start listening for guest checkouts
+        startCheckoutListener()
     }
 
     private fun initViews() {
@@ -156,7 +174,12 @@ class MainActivity : AppCompatActivity() {
                     return true
                 }
                 KeyEvent.KEYCODE_DPAD_UP -> {
-                    // Show settings button
+                    // Show device control menu
+                    showDeviceControlMenu()
+                    return true
+                }
+                KeyEvent.KEYCODE_DPAD_DOWN -> {
+                    // Navigate to quick actions
                     return true
                 }
                 KeyEvent.KEYCODE_DPAD_CENTER,
@@ -172,6 +195,21 @@ class MainActivity : AppCompatActivity() {
                 KeyEvent.KEYCODE_MENU -> {
                     // Open settings
                     showSettingsDialog()
+                    return true
+                }
+                KeyEvent.KEYCODE_VOLUME_UP -> {
+                    deviceController?.increaseVolume()
+                    updateVolumeDisplay()
+                    return true
+                }
+                KeyEvent.KEYCODE_VOLUME_DOWN -> {
+                    deviceController?.decreaseVolume()
+                    updateVolumeDisplay()
+                    return true
+                }
+                KeyEvent.KEYCODE_MUTE -> {
+                    deviceController?.toggleMute()
+                    updateVolumeDisplay()
                     return true
                 }
             }
@@ -288,5 +326,175 @@ class MainActivity : AppCompatActivity() {
             .setMessage("Version 1.0\n© 2024 Hotel TV System")
             .setPositiveButton("OK", null)
             .show()
+    }
+    
+    private fun showDeviceControlMenu() {
+        val volume = deviceController?.getVolumeLevel() ?: 50
+        val isMuted = deviceController?.isMuted() ?: false
+        val items = arrayOf(
+            "Volume: $volume%${if (isMuted) " (Muted)" else ""}",
+            "Increase Volume",
+            "Decrease Volume",
+            "${if (isMuted) "Unmute" else "Mute"}",
+            "Reboot Device",
+            "Shutdown Device",
+            "Device Info"
+        )
+        
+        AlertDialog.Builder(this)
+            .setTitle("Device Control")
+            .setItems(items) { _, which ->
+                when (which) {
+                    0 -> Toast.makeText(this, "Current volume: $volume%", Toast.LENGTH_SHORT).show()
+                    1 -> {
+                        deviceController?.increaseVolume()
+                        updateVolumeDisplay()
+                    }
+                    2 -> {
+                        deviceController?.decreaseVolume()
+                        updateVolumeDisplay()
+                    }
+                    3 -> {
+                        deviceController?.toggleMute()
+                        updateVolumeDisplay()
+                    }
+                    4 -> {
+                        AlertDialog.Builder(this)
+                            .setTitle("Reboot Device")
+                            .setMessage("Are you sure you want to reboot? This requires root access.")
+                            .setPositiveButton("Reboot") { _, _ ->
+                                val success = deviceController?.rebootDevice()
+                                Toast.makeText(this, 
+                                    if (success == true) "Rebooting..." else "Reboot failed - requires root", 
+                                    Toast.LENGTH_LONG).show()
+                            }
+                            .setNegativeButton("Cancel", null)
+                            .show()
+                    }
+                    5 -> {
+                        AlertDialog.Builder(this)
+                            .setTitle("Shutdown Device")
+                            .setMessage("Are you sure you want to shutdown? This requires root access.")
+                            .setPositiveButton("Shutdown") { _, _ ->
+                                val success = deviceController?.shutdownDevice()
+                                Toast.makeText(this, 
+                                    if (success == true) "Shutting down..." else "Shutdown failed - requires root", 
+                                    Toast.LENGTH_LONG).show()
+                            }
+                            .setNegativeButton("Cancel", null)
+                            .show()
+                    }
+                    6 -> showDeviceInfo()
+                }
+            }
+            .show()
+    }
+    
+    private fun updateVolumeDisplay() {
+        val volume = deviceController?.getVolumeLevel() ?: 50
+        val isMuted = deviceController?.isMuted() ?: false
+        volumeLevelText.text = if (isMuted) "🔇 Muted" else "🔊 $volume%"
+    }
+    
+    private fun showDeviceInfo() {
+        val deviceId = PreferencesManager.getDeviceId(this)
+        val model = deviceController?.getDeviceModel() ?: "Unknown"
+        val androidVersion = deviceController?.getAndroidVersion() ?: "Unknown"
+        val serialNumber = deviceController?.getDeviceSerialNumber() ?: "Unknown"
+        val connectionType = networkMonitor?.getConnectionType() ?: "Unknown"
+        val signalStrength = networkMonitor?.getSignalStrength() ?: -1
+        
+        val info = """Device ID: $deviceId
+Model: $model
+Android: $androidVersion
+Serial: $serialNumber
+Connection: $connectionType
+Signal: ${if (signalStrength >= 0) "$signalStrength/4 bars" else "N/A"}
+Status: ${if (networkMonitor?.isOnline() == true) "🟢 Online" else "🔴 Offline"}
+        """.trimIndent()
+        
+        AlertDialog.Builder(this)
+            .setTitle("Device Information")
+            .setMessage(info)
+            .setPositiveButton("OK", null)
+            .setNeutralButton("Copy") { _, _ ->
+                // Copy to clipboard functionality
+                val clipboard = getSystemService(CLIPBOARD_SERVICE) as android.content.ClipboardManager
+                val clip = android.content.ClipData.newPlainText("Device Info", info)
+                clipboard.setPrimaryClip(clip)
+                Toast.makeText(this, "Copied to clipboard", Toast.LENGTH_SHORT).show()
+            }
+            .show()
+    }
+    
+    private fun startNetworkHeartbeat() {
+        networkMonitor?.startHeartbeat(object : NetworkMonitor.ConnectionListener {
+            override fun onConnectionStateChanged(isOnline: Boolean) {
+                runOnUiThread {
+                    networkStatusIcon.text = if (isOnline) "🟢" else "🔴"
+                    networkStatusIcon.contentDescription = if (isOnline) "Online" else "Offline"
+                }
+            }
+            
+            override fun onHeartbeatSent(success: Boolean) {
+                // Heartbeat sent successfully
+                Log.d("MainActivity", "Heartbeat sent: $success")
+            }
+        })
+        
+        // Update volume display initially
+        updateVolumeDisplay()
+    }
+    
+    private fun startCheckoutListener() {
+        checkoutListener?.startListeningForCheckouts(object : CheckoutListener.CheckoutCallback {
+            override fun onGuestCheckout(roomNumber: String, guestName: String?) {
+                runOnUiThread {
+                    Toast.makeText(
+                        this@MainActivity,
+                        "Guest checkout detected for Room $roomNumber",
+                        Toast.LENGTH_LONG
+                    ).show()
+                }
+            }
+            
+            override fun onClearDataStarted() {
+                runOnUiThread {
+                    Toast.makeText(
+                        this@MainActivity,
+                        "Clearing streaming apps data...",
+                        Toast.LENGTH_LONG
+                    ).show()
+                }
+            }
+            
+            override fun onClearDataCompleted(result: ClearResult) {
+                runOnUiThread {
+                    val message = buildString {
+                        appendLine("App data clearing completed!")
+                        appendLine("✅ Success: ${result.successCount} apps")
+                        if (result.failedApps.isNotEmpty()) {
+                            appendLine("❌ Failed: ${result.failedCount} apps")
+                        }
+                    }
+                    
+                    android.app.AlertDialog.Builder(this@MainActivity)
+                        .setTitle("Checkout Cleanup Complete")
+                        .setMessage(message.trimIndent())
+                        .setPositiveButton("OK", null)
+                        .show()
+                }
+            }
+            
+            override fun onError(message: String) {
+                runOnUiThread {
+                    Toast.makeText(
+                        this@MainActivity,
+                        "Checkout cleanup error: $message",
+                        Toast.LENGTH_LONG
+                    ).show()
+                }
+            }
+        })
     }
 }
