@@ -35,6 +35,17 @@ const updateHotelSchema = z.object({
   supportPhone: z.string().optional(),
   supportEmail: z.string().email().optional(),
   totalRooms: z.number().int().min(0).optional(),
+  // Branding fields
+  logoUrl: z.string().optional(),
+  primaryColor: z.string().optional(),
+  secondaryColor: z.string().optional(),
+  welcomeMessage: z.string().optional(),
+  welcomeMessageEn: z.string().optional(),
+  launcherBackground: z.string().optional(),
+  // Weather fields
+  weatherCity: z.string().optional(),
+  weatherApiKey: z.string().optional(),
+  showWeather: z.boolean().optional(),
   isActive: z.boolean().optional(),
 });
 

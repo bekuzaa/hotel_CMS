@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import CMSDashboardLayout from "@/components/CMSDashboardLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { trpc } from "@/lib/trpc";
-import { BarChart3, Tv, Users, Home, AlertCircle, Building2, Calendar, CreditCard } from "lucide-react";
+import { BarChart3, Tv, Users, Home, AlertCircle, Building2, Calendar, CreditCard, UtensilsCrossed, Clock, CheckCircle, Broom } from "lucide-react";
 import { useAuth } from "@/_core/hooks/useAuth";
 import {
   Select,
@@ -77,6 +77,12 @@ export default function Dashboard() {
   const hotelStats = trpc.hotels.getStats.useQuery(
     { hotelId: hotelId || undefined },
     { enabled: !!hotelId || isHotelAdmin }
+  );
+
+  // Get service request stats
+  const serviceStats = trpc.guestServices.getRequestStats.useQuery(
+    { hotelId: hotelId || 1 },
+    { enabled: !!hotelId || !isSuperAdmin }
   );
 
   useEffect(() => {
@@ -242,6 +248,40 @@ export default function Dashboard() {
             color="text-red-600"
           />
         </div>
+
+        {/* Service Requests Statistics */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <UtensilsCrossed className="w-5 h-5" />
+              Service Requests
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <div className="text-center p-4 bg-yellow-50 rounded-lg">
+                <Clock className="w-8 h-8 mx-auto text-yellow-600 mb-2" />
+                <p className="text-2xl font-bold text-yellow-700">{serviceStats.data?.pending || 0}</p>
+                <p className="text-sm text-yellow-600">Pending</p>
+              </div>
+              <div className="text-center p-4 bg-blue-50 rounded-lg">
+                <AlertCircle className="w-8 h-8 mx-auto text-blue-600 mb-2" />
+                <p className="text-2xl font-bold text-blue-700">{serviceStats.data?.inProgress || 0}</p>
+                <p className="text-sm text-blue-600">In Progress</p>
+              </div>
+              <div className="text-center p-4 bg-green-50 rounded-lg">
+                <CheckCircle className="w-8 h-8 mx-auto text-green-600 mb-2" />
+                <p className="text-2xl font-bold text-green-700">{serviceStats.data?.completed || 0}</p>
+                <p className="text-sm text-green-600">Completed</p>
+              </div>
+              <div className="text-center p-4 bg-purple-50 rounded-lg">
+                <Broom className="w-8 h-8 mx-auto text-purple-600 mb-2" />
+                <p className="text-2xl font-bold text-purple-700">{serviceStats.data?.byType?.housekeeping || 0}</p>
+                <p className="text-sm text-purple-600">Housekeeping</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
 
         {/* Quick Actions */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">

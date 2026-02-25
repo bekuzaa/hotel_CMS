@@ -137,19 +137,21 @@ describe("hotels router", () => {
     it("should throw error for duplicate hotel code", async () => {
       const caller = appRouter.createCaller(ctx);
 
+      const uniqueCode = `DUP_${Date.now()}`;
+
       // First create should succeed
       await caller.hotels.create({
         hotelName: "Test Hotel 1",
-        hotelCode: "DUPLICATE_CODE",
+        hotelCode: uniqueCode,
       });
 
       // Second create with same code should fail
       await expect(
         caller.hotels.create({
           hotelName: "Test Hotel 2",
-          hotelCode: "DUPLICATE_CODE",
+          hotelCode: uniqueCode,
         })
-      ).rejects.toThrow();
+      ).rejects.toThrow("Hotel code already exists");
     });
   });
 

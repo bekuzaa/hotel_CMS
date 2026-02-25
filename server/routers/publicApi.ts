@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { publicProcedure, router } from "../_core/trpc";
 import { getDb } from "../db";
-import { tvChannels, menuItems, backgroundImages, guestInformation, rooms, systemConfig } from "../../drizzle/schema";
+import { tvChannels, menuItems, backgroundImages, guestInformation, rooms, systemConfig, hotels } from "../../drizzle/schema";
 import { eq, and } from "drizzle-orm";
 
 /**
@@ -264,4 +264,59 @@ export const publicApiRouter = router({
       images: images.map(i => ({ id: i.id, url: i.imageUrl })),
     };
   }),
+
+  // Get weather for hotel
+  getWeather: publicProcedure
+    .input(z.object({ hotelId: z.number() }))
+    .query(async ({ input }) => {
+      const db = await getDb();
+      if (!db) return null;
+
+      const hotel = await db.select().from(hotels).where(eq(hotels.id, input.hotelId)).limit(1);
+      const hotelData = hotel[0];
+
+      if (!hotelData || !(hotelData as any).weatherCity || (hotelData as any).showWeather === false) {
+        return null;
+      }
+
+      const city = (hotelData as any).weatherCity;
+      const apiKey = (hotelData as any).weatherApiKey;
+
+      // Use OpenWeatherMap API if key is configured, otherwise return mock data
+      if (apiKey) {
+        try {
+          const response = await fetch(
+            `https://api.openweathermap.org/data/2.5/weather?q=${encodeURIComponent(city)}&appid=${apiKey}&units=metric`
+          );
+          if (response.ok) {
+            const data = await response.json();
+            return {
+              city: data.name,
+              temp: Math.round(data.main.temp),
+              description: data.weather[0].description,
+              icon: data.weather[0].icon,
+              humidity: data.main.humidity,
+              feelsLike: Math.round(data.main.feels_like),
+            };
+          }
+        } catch (error) {
+          console.error("Weather API error:", error);
+        }
+      }
+
+      // Return mock weather data for demo purposes
+      const mockWeather = [
+        { temp: 28, description: "Partly Cloudy", icon: "02d", humidity: 75 },
+        { temp: 32, description: "Sunny", icon: "01d", humidity: 60 },
+        { temp: 25, description: "Light Rain", icon: "10d", humidity: 85 },
+        { temp: 30, description: "Clear Sky", icon: "01d", humidity: 65 },
+      ];
+      const randomWeather = mockWeather[Math.floor(Math.random() * mockWeather.length)];
+      
+      return {
+        city: city.split(",")[0],
+        ...randomWeather,
+        feelsLike: randomWeather.temp - 2,
+      };
+    }),
 });

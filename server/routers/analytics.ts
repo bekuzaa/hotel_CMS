@@ -72,22 +72,32 @@ export const analyticsRouter = router({
   // Get room occupancy statistics
   getRoomOccupancy: publicProcedure.query(async () => {
     const db = await getDb();
-    if (!db) return { occupied: 0, vacant: 0, maintenance: 0 };
+    if (!db) return { occupied: 0, vacant: 0, maintenance: 0, occupancyRate: 0 };
 
     try {
-      const occupiedRooms = await db.select({ count: count() }).from(guestInformation);
+      const now = new Date();
+      
+      // Count only active guests (checked in but not checked out yet)
+      const occupiedRoomsData = await db.select({ count: count() }).from(guestInformation)
+        .where(and(
+          eq(guestInformation.isActive, true),
+          sql`check_in_date IS NOT NULL`,
+          sql`(check_out_date IS NULL OR check_out_date > ${now})`
+        ));
+      
       const totalRoomsData = await db.select({ count: count() }).from(rooms)
         .where(eq(rooms.isActive, true));
 
       const total = totalRoomsData[0]?.count || 0;
-      const occupied = occupiedRooms[0]?.count || 0;
-      const vacant = total - occupied;
+      const occupied = occupiedRoomsData[0]?.count || 0;
+      const actualOccupied = Math.min(occupied, total); // Ensure occupied doesn't exceed total
+      const vacant = total - actualOccupied;
 
       return {
-        occupied,
+        occupied: actualOccupied,
         vacant,
         maintenance: 0,
-        occupancyRate: total > 0 ? Math.round((occupied / total) * 100) : 0,
+        occupancyRate: total > 0 ? Math.round((actualOccupied / total) * 100) : 0,
       };
     } catch (error) {
       console.error("Error fetching room occupancy:", error);

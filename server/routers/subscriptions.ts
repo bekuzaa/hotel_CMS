@@ -1,9 +1,9 @@
 import { z } from "zod";
-import { protectedProcedure, router } from "_core/trpc";
+import { protectedProcedure, router } from "../_core/trpc";
 import { getDb } from "../db";
 import { subscriptionPackages, hotelSubscriptions, hotels, users } from "../../drizzle/schema";
 import { eq, and, lt, gt, sql } from "drizzle-orm";
-import { notifyOwner } from "_core/notification";
+import { notifyOwner } from "../_core/notification";
 
 export const subscriptionsRouter = router({
   // Subscription Packages Management (Super Admin only)

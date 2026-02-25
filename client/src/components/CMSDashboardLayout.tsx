@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
-import { Menu, X, LogOut, Settings, BarChart3, Building2, CreditCard, Monitor, User, ChevronDown } from "lucide-react";
+import { Menu, X, LogOut, Settings, BarChart3, Building2, CreditCard, Monitor, User, ChevronDown, Tv, UtensilsCrossed, Palette, Clock } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { trpc } from "@/lib/trpc";
 import {
@@ -30,6 +30,10 @@ const navItems: NavItem[] = [
   { label: "Guest Info", href: "/guests", icon: <span className="w-5 h-5">👥</span> },
   { label: "Media Gallery", href: "/media", icon: <span className="w-5 h-5">🎨</span> },
   { label: "Devices", href: "/devices", icon: <Monitor className="w-5 h-5" /> },
+  { label: "TV Apps", href: "/tv-apps", icon: <Tv className="w-5 h-5" /> },
+  { label: "Guest Services", href: "/guest-services", icon: <UtensilsCrossed className="w-5 h-5" /> },
+  { label: "Wake-up Calls", href: "/wake-up-calls", icon: <Clock className="w-5 h-5" /> },
+  { label: "Branding", href: "/branding", icon: <Palette className="w-5 h-5" /> },
   { label: "Localization", href: "/localization", icon: <span className="w-5 h-5">🌐</span>, roles: ["admin"] },
   { label: "Users", href: "/users", icon: <span className="w-5 h-5">👮</span>, roles: ["admin", "superAdmin"] },
   { label: "Settings", href: "/settings", icon: <Settings className="w-5 h-5" />, roles: ["admin", "hotelAdmin"] },

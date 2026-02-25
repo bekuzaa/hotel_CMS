@@ -3,6 +3,15 @@ import CMSDashboardLayout from "@/components/CMSDashboardLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { trpc } from "@/lib/trpc";
 import {
   Power,
@@ -15,6 +24,9 @@ import {
   WifiOff,
   Plus,
   RefreshCw,
+  Link,
+  Link2,
+  Link2Off,
 } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "@/_core/hooks/useAuth";
@@ -29,6 +41,10 @@ import {
 export default function Devices() {
   const { user } = useAuth();
   const [selectedHotelId, setSelectedHotelId] = useState<number | null>(null);
+  const [pairingCode, setPairingCode] = useState("");
+  const [showPairingDialog, setShowPairingDialog] = useState(false);
+  const [roomNumber, setRoomNumber] = useState("");
+  const [deviceName, setDeviceName] = useState("");
 
   const isSuperAdmin = user?.role === "superAdmin";
   const isHotelAdmin = user?.role === "hotelAdmin";
@@ -99,8 +115,44 @@ export default function Devices() {
       toast.success("All devices powered off");
       devicesList.refetch();
     },
-    onError: (error) => toast.error(error.message),
+    onError: (error: any) => toast.error(error.message),
   });
+
+  // Pairing mutations
+  const validateCode = trpc.pairing.validateCode.useQuery(
+    { code: pairingCode },
+    { enabled: pairingCode.length === 6 }
+  );
+
+  const pairDevice = trpc.pairing.pairDevice.useMutation({
+    onSuccess: () => {
+      toast.success("Device paired successfully!");
+      setShowPairingDialog(false);
+      setPairingCode("");
+      setRoomNumber("");
+      setDeviceName("");
+      devicesList.refetch();
+    },
+    onError: (error: any) => toast.error(error.message),
+  });
+
+  const unpairDevice = trpc.pairing.unpairDevice.useMutation({
+    onSuccess: () => {
+      toast.success("Device unpaired");
+      devicesList.refetch();
+    },
+    onError: (error: any) => toast.error(error.message),
+  });
+
+  const handlePairDevice = () => {
+    if (!hotelId || pairingCode.length !== 6) return;
+    pairDevice.mutate({
+      code: pairingCode,
+      hotelId,
+      roomNumber: roomNumber || undefined,
+      deviceName: deviceName || undefined,
+    });
+  };
 
   const handleVolumeChange = (deviceId: number, volume: number) => {
     setVolume.mutate({ id: deviceId, volume });
@@ -156,6 +208,13 @@ export default function Devices() {
             >
               <RefreshCw className="w-4 h-4" />
               Refresh
+            </Button>
+            <Button
+              onClick={() => setShowPairingDialog(true)}
+              className="gap-2 bg-blue-600 hover:bg-blue-700"
+            >
+              <Link2 className="w-4 h-4" />
+              Pair New Device
             </Button>
             {hotelId && (
               <Button
@@ -425,6 +484,77 @@ export default function Devices() {
             )}
           </CardContent>
         </Card>
+
+        {/* Pair Device Dialog */}
+        <Dialog open={showPairingDialog} onOpenChange={setShowPairingDialog}>
+          <DialogContent className="sm:max-w-md">
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2">
+                <Link2 className="w-5 h-5" />
+                Pair New Device
+              </DialogTitle>
+              <DialogDescription>
+                Enter the 6-character code displayed on your TV device to pair it with this hotel.
+              </DialogDescription>
+            </DialogHeader>
+            <div className="space-y-4 py-4">
+              <div className="space-y-2">
+                <Label htmlFor="pairingCode">Pairing Code</Label>
+                <Input
+                  id="pairingCode"
+                  placeholder="Enter 6-character code (e.g., A3B7X9)"
+                  value={pairingCode}
+                  onChange={(e) => setPairingCode(e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, "").slice(0, 6))}
+                  className="text-center text-2xl tracking-widest uppercase"
+                  maxLength={6}
+                />
+              </div>
+
+              {validateCode.data?.valid && validateCode.data.device && (
+                <div className="p-4 rounded-lg bg-green-50 border border-green-200">
+                  <p className="text-sm font-medium text-green-800">Device Found!</p>
+                  <p className="text-xs text-green-600 mt-1">
+                    {validateCode.data.device.deviceName}
+                  </p>
+                </div>
+              )}
+
+              {pairingCode.length === 6 && !validateCode.data?.valid && (
+                <div className="p-4 rounded-lg bg-red-50 border border-red-200">
+                  <p className="text-sm text-red-600">Invalid or expired code</p>
+                </div>
+              )}
+
+              <div className="space-y-2">
+                <Label htmlFor="roomNumber">Room Number (Optional)</Label>
+                <Input
+                  id="roomNumber"
+                  placeholder="e.g., 101"
+                  value={roomNumber}
+                  onChange={(e) => setRoomNumber(e.target.value)}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="deviceName">Device Name (Optional)</Label>
+                <Input
+                  id="deviceName"
+                  placeholder="e.g., Room 101 TV"
+                  value={deviceName}
+                  onChange={(e) => setDeviceName(e.target.value)}
+                />
+              </div>
+
+              <Button
+                onClick={handlePairDevice}
+                disabled={!validateCode.data?.valid || pairDevice.isPending}
+                className="w-full"
+              >
+                {pairDevice.isPending ? "Pairing..." : "Pair Device"}
+              </Button>
+            </div>
+          </DialogContent>
+        </Dialog>
       </div>
     </CMSDashboardLayout>
   );

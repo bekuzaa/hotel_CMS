@@ -18,12 +18,17 @@ import { hotelsRouter } from "./routers/hotels";
 import { syncRouter } from "./routers/sync";
 import { devicesRouter } from "./routers/devices";
 import { authRouter } from "./routers/auth";
+import { pairingRouter } from "./routers/pairing";
+import { tvAppsRouter } from "./routers/tvApps";
+import { guestServicesRouter } from "./routers/guestServices";
+import { wakeUpCallsRouter } from "./routers/wakeUpCalls";
 
 export const appRouter = router({
     // if you need to use socket.io, read and register route in server/_core/index.ts, all api should start with '/api/' so that the gateway can route correctly
   system: systemRouter,
   subscriptions: subscriptionsRouter,
   auth: authRouter,
+  pairing: pairingRouter,
 
   // Hotel TV System routers
   hotels: hotelsRouter,
@@ -40,6 +45,9 @@ export const appRouter = router({
   activityLogs: activityLogsRouter,
   sync: syncRouter,
   devices: devicesRouter,
+  tvApps: tvAppsRouter,
+  guestServices: guestServicesRouter,
+  wakeUpCalls: wakeUpCallsRouter,
 });
 
 export type AppRouter = typeof appRouter;

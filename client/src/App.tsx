@@ -18,6 +18,11 @@ import Localization from "./pages/Localization";
 import HotelsManagement from "./pages/HotelsManagement";
 import SubscriptionManagement from "./pages/SubscriptionManagement";
 import Devices from "./pages/Devices";
+import TVLauncher from "./pages/TVLauncher";
+import TVApps from "./pages/TVApps";
+import GuestServices from "./pages/GuestServices";
+import HotelBranding from "./pages/HotelBranding";
+import WakeUpCalls from "./pages/WakeUpCalls";
 import { useAuth } from "./_core/hooks/useAuth";
 import { Loader2 } from "lucide-react";
 import { useEffect } from "react";
@@ -54,6 +59,8 @@ function Router() {
   return (
     <Switch>
       <Route path="/" component={Home} />
+      <Route path="/tv" component={TVLauncher} />
+      <Route path="/launcher" component={TVLauncher} />
       <Route path="/dashboard" component={() => <ProtectedRoute component={Dashboard} />} />
       <Route path="/channels" component={() => <ProtectedRoute component={TVChannels} />} />
       <Route path="/menus" component={() => <ProtectedRoute component={Menus} />} />
@@ -67,6 +74,10 @@ function Router() {
       <Route path="/hotels" component={() => <ProtectedRoute component={HotelsManagement} />} />
       <Route path="/subscriptions" component={() => <ProtectedRoute component={SubscriptionManagement} />} />
       <Route path="/devices" component={() => <ProtectedRoute component={Devices} />} />
+      <Route path="/tv-apps" component={() => <ProtectedRoute component={TVApps} />} />
+      <Route path="/guest-services" component={() => <ProtectedRoute component={GuestServices} />} />
+      <Route path="/branding" component={() => <ProtectedRoute component={HotelBranding} />} />
+      <Route path="/wake-up-calls" component={() => <ProtectedRoute component={WakeUpCalls} />} />
       <Route path="/404" component={NotFound} />
       <Route component={NotFound} />
     </Switch>

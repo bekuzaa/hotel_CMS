@@ -1,54 +1,12 @@
 {
   "version": "7",
-  "dialect": "mysql",
+  "dialect": "sqlite",
   "entries": [
     {
       "idx": 0,
-      "version": "5",
-      "when": 1770922679947,
-      "tag": "0000_dazzling_mandarin",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "5",
-      "when": 1770922954906,
-      "tag": "0001_closed_the_santerians",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "5",
-      "when": 1771087607985,
-      "tag": "0002_sleepy_morg",
-      "breakpoints": true
-    },
-    {
-      "idx": 3,
-      "version": "5",
-      "when": 1771123756801,
-      "tag": "0003_lowly_krista_starr",
-      "breakpoints": true
-    },
-    {
-      "idx": 4,
-      "version": "5",
-      "when": 1771584000000,
-      "tag": "0004_add_last_reminder_sent",
-      "breakpoints": true
-    },
-    {
-      "idx": 5,
-      "version": "5",
-      "when": 1771670000000,
-      "tag": "0005_add_device_control_fields",
-      "breakpoints": true
-    },
-    {
-      "idx": 6,
-      "version": "5",
-      "when": 1771750000000,
-      "tag": "0006_add_local_auth",
+      "version": "6",
+      "when": 1771820670061,
+      "tag": "0000_lyrical_purple_man",
       "breakpoints": true
     }
   ]
