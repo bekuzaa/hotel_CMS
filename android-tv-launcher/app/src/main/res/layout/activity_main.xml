@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/launcher_background">
+
+    <!-- Background Overlay -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#4D000000" />
+
+    <!-- Top Bar - Time, Weather, Device Info -->
+    <LinearLayout
+        android:id="@+id/topBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="32dp"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <!-- Left Side - Logo & Welcome -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <ImageView
+                android:id="@+id/hotelLogo"
+                android:layout_width="64dp"
+                android:layout_height="64dp"
+                android:scaleType="fitCenter"
+                android:contentDescription="Hotel Logo" />
+
+            <TextView
+                android:id="@+id/welcomeText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="WELCOME TO YOUR ROOM"
+                android:textColor="#FFFFFF"
+                android:textSize="24sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <!-- Right Side - Time, Weather, Device Code -->
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="end">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
+
+                <TextView
+                    android:id="@+id/weatherText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="16dp"
+                    android:text="28°C"
+                    android:textColor="#FFFFFF"
+                    android:textSize="18sp" />
+
+                <TextView
+                    android:id="@+id/timeText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="12:00 PM"
+                    android:textColor="#FFFFFF"
+                    android:textSize="48sp"
+                    android:textStyle="light" />
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/dateText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:text="Monday, January 1, 2024"
+                android:textColor="#CCCCCC"
+                android:textSize="16sp" />
+
+            <TextView
+                android:id="@+id/deviceCodeText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="Device: TV-XXXXX"
+                android:textColor="#888888"
+                android:textSize="12sp"
+                android:fontFamily="monospace" />
+
+            <TextView
+                android:id="@+id/pairingStatusText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:text="Waiting for pairing..."
+                android:textColor="#FF6B6B"
+                android:textSize="12sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <!-- Center - Apps Grid -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/appsRecyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="100dp"
+        android:clipToPadding="false"
+        android:paddingHorizontal="64dp"
+        app:layout_constraintTop_toBottomOf="@id/topBar" />
+
+    <!-- Bottom - Quick Actions Bar -->
+    <LinearLayout
+        android:id="@+id/quickActionsBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:padding="24dp"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <Button
+            android:id="@+id/btnRoomService"
+            style="@style/QuickActionButton"
+            android:text="Room Service" />
+
+        <Button
+            android:id="@+id/btnHousekeeping"
+            style="@style/QuickActionButton"
+            android:text="Housekeeping" />
+
+        <Button
+            android:id="@+id/btnWakeUp"
+            style="@style/QuickActionButton"
+            android:text="Wake-up" />
+
+        <Button
+            android:id="@+id/btnHotelInfo"
+            style="@style/QuickActionButton"
+            android:text="Hotel Info" />
+
+        <Button
+            android:id="@+id/btnFrontDesk"
+            style="@style/QuickActionButton"
+            android:text="Front Desk" />
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

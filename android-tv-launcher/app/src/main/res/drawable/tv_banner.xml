@@ -1,0 +1,29 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="320dp"
+    android:height="180dp"
+    android:viewportWidth="320"
+    android:viewportHeight="180">
+    
+    <!-- Background -->
+    <path
+        android:fillColor="#4ECDC4"
+        android:pathData="M0,0h320v180h-320z"/>
+    
+    <!-- TV Screen Outline -->
+    <path
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="4"
+        android:fillColor="#00000000"
+        android:pathData="M60,40 L260,40 L260,140 L60,140 Z"/>
+    
+    <!-- Hotel Text -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M90,70 L230,70 L230,90 L90,90 Z"/>
+    
+    <!-- Welcome Text Line -->
+    <path
+        android:fillColor="#FF6B6B"
+        android:pathData="M100,100 L220,100 L220,110 L100,110 Z"/>
+    
+</vector>
